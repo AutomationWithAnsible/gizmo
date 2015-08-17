@@ -1,0 +1,93 @@
+#!/bin/bash
+set -e
+
+# GIZMODIR
+# GIZMOGIT
+# GIZMOROLESDIR
+# GIZMOROLESGIT
+# AUTOMATIONDIR
+# AUTOMATIONGIT
+# GIZMO_PROFILE
+
+env_file=/tmp/$RANDOM.txt
+gizmo_setup="$HOME/.gizmo_setup"
+
+echo "*** Please note some operation requires root access. You might be asked for your root password"
+echo ""
+env > $env_file
+
+config() {
+  if grep -q "^$1=" $env_file; then
+    echo "  $1=${!1}" >&2
+    echo "${!1}"
+  else
+    echo "  $1=$2" >&2
+    echo "$2"
+  fi
+}
+echo "Config variables:"
+GIZMODIR=$(config "GIZMODIR" "$HOME/gizmo")
+GIZMOGIT=$(config "GIZMOGIT" "git@github.com:AutomationWithAnsible/gizmo.git")
+GIZMOROLESDIR=$(config "GIZMOROLESDIR" "$HOME/gizmo/roles")
+GIZMOROLESGIT=$(config "GIZMOROLESGIT" "git@github.com:AutomationWithAnsible/gizmoroles.git")
+AUTOMATIONDIR=$(config "AUTOMATIONDIR" "$HOME/automation")
+AUTOMATIONGIT=$(config "AUTOMATIONGIT" "git@github.com:enginyoyen/ansible-best-practises.git")
+GIZMO_PROFILE=$(config "GIZMO_PROFILE" "$HOME/.gizmo_profile")
+source_line="source $GIZMO_PROFILE"
+echo
+
+if [ ! $(which git) ]; then
+  echo "please install git and try again..."
+  exit 1
+fi
+
+if [ ! $(which pip) ]; then
+  if [ ! $(which easy_install) ]; then
+    echo "Your python environment is not set properly. Please check your environment ..."
+    exit 1
+  else
+    echo "installing pip"
+    sudo easy_install pip
+  fi
+fi
+
+if [ ! -d $GIZMODIR ]; then
+  echo "gizmo clonning '$GIZMOGIT' in '$GIZMODIR' "
+  git clone $GIZMOGIT $GIZMODIR
+else
+  echo "gizmo pull '$GIZMOGIT' in '$GIZMODIR' "
+  cd $GIZMODIR
+  git pull
+fi
+
+chmod 700 $GIZMODIR
+#
+# echo "Installing Ansible and its requirements using PIP"
+# cd $GIZMODIR
+# pip install -r $GIZMODIR/requirements.txt
+#
+# if [ ! -d $AUTOMATIONDIR ]; then
+#   echo "Automation clonning '$AUTOMATIONGIT' in '$AUTOMATIONDIR' "
+#   git clone $AUTOMATIONGIT $AUTOMATIONDIR
+# else
+#   echo "Automation pull '$AUTOMATIONGIT' in '$AUTOMATIONDIR' "
+#   cd $AUTOMATIONDIR
+#   git pull
+# fi
+
+
+cat profile > $HOME/.gizmo_profile
+
+# Shell profile
+if [ "$SHELL" = "/bin/zsh" ]; then
+  SHELLPROFILE="$HOME/.zshrc"
+elif [ "$SHELL" = "/bin/bash" ]; then
+  SHELLPROFILE="$HOME/.bash_profile"
+else
+  echo "** Unknown shell '$SHELL'"
+fi
+
+if [ $(grep -c "$source_line" $SHELLPROFILE ) -eq 0 ]; then
+  echo "Adding gizmo_profile to $SHELLPROFILE..."
+  echo "$source_line" >> $SHELLPROFILE
+fi

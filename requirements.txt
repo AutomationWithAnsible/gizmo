@@ -1,0 +1,24 @@
+# Modules required by ansible
+PyYAML
+Jinja2
+httplib2
+six
+paramiko==1.12.2 # joyent python breaks with new version (TODO FIX)
+
+# yetu dynect specific
+DynectDNS
+
+# yetu-joyent specific
+git+https://github.com/yetu/py-smartdc.git
+requests
+
+#Joyent inv
+daemonize
+
+# for elastic-callback
+elasticsearch
+simplejson
+tabulate
+
+# Ansible Version
+ansible==v1.9.3-0.1.rc1

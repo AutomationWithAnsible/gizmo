@@ -21,4 +21,4 @@ simplejson
 tabulate
 
 # Ansible Version
-ansible==v1.9.3-0.1.rc1
+ansible==v1.9.2

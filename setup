@@ -64,18 +64,18 @@ if [ ! $(which pip) ]; then
   fi
 fi
 
-echo "Installing Ansible and its requirements using PIP"
-cd $GIZMODIR
-pip install -r $GIZMODIR/requirements.txt
 
 gitget $GIZMODIR $GIZMOGIT "gizmo"
 chmod 700 $GIZMODIR
 
+echo "Installing Ansible and its requirements using PIP"
+cd $GIZMODIR
+pip install -r $GIZMODIR/requirements.txt
+
 gitget $GIZMOROLESDIR $GIZMOROLESGIT "gizmo roles"
 
-gitget $AUTOMATIONDIR $AUTOMATIONGIT "Automation"
-
-
+##
+#gitget $AUTOMATIONDIR $AUTOMATIONGIT "Automation"
 
 # Shell profile
 cat profile > $HOME/.gizmo_profile
